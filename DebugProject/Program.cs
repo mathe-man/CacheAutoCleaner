@@ -1,0 +1,1 @@
+﻿Console.WriteLine("Free to use local debug project");
