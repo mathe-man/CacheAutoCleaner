@@ -42,6 +42,11 @@ public class Folder : IFileSystemElement
             children.Add(new Folder(folder));
         }
 
+        foreach (var file in Directory.EnumerateFiles(FullPath))
+        {
+            children.Add(new FileItem(file));
+        }
+
         return children.ToArray();
     }
 }

@@ -2,12 +2,12 @@
 
 public class Finder
 {
-    public IFileSystemElement[] Find(string name, Folder startingFolder)
+    public static IFileSystemElement[] Find(string name, Folder startingFolder)
     {
         return RecursiveSearch(name, startingFolder).ToArray();
     }
 
-    private List<IFileSystemElement> RecursiveSearch(string name, Folder start)
+    private static List<IFileSystemElement> RecursiveSearch(string name, Folder start)
     {
         var result = new List<IFileSystemElement>();
         foreach (var child in start.GetChildren())
