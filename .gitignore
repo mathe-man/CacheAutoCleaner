@@ -1,0 +1,15 @@
+﻿
+# IDEs' files
+.vs/
+.vscode/
+.idea/
+
+# Compile outputs
+**/obj/
+**/bin/
+
+# User-specific files
+*.suo
+*.user
+*.filters
+
