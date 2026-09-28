@@ -6,11 +6,11 @@ public interface IFileSystemElement
     public string Name { get; }
     public string FullPath { get; }
     
-    public void Delete();
+    public bool Delete();
     public IFileSystemElement[] GetChildren();
 
     public bool Contains(string name)
     {
-        return Name.Contains(name);
+        return Name.Contains(name, StringComparison.OrdinalIgnoreCase);
     }
 }

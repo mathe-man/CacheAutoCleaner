@@ -24,28 +24,43 @@ public class Folder : IFileSystemElement
         Exists = Directory.Exists(fullPath);
     }
 
-    public void Delete()
+    public bool Delete()
     {
         if (Exists)
         {
-            Directory.Delete(FullPath, true);
-            Exists = false;
+            try
+            {
+                Directory.Delete(FullPath, true);
+                Exists = false;
+                return true;
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
         }
+        return false;
     }
 
     public IFileSystemElement[] GetChildren()
     {
         var children = new List<IFileSystemElement>();
 
-        foreach (var folder in Directory.EnumerateDirectories(FullPath))
+        try
         {
-            children.Add(new Folder(folder));
-        }
+            foreach (var folder in Directory.EnumerateDirectories(FullPath))
+            {
+                children.Add(new Folder(folder));
+            }
 
-        foreach (var file in Directory.EnumerateFiles(FullPath))
-        {
-            children.Add(new FileItem(file));
+            foreach (var file in Directory.EnumerateFiles(FullPath))
+            {
+                children.Add(new FileItem(file));
+            }
         }
+        catch (UnauthorizedAccessException e) {}
+        
 
         return children.ToArray();
     }

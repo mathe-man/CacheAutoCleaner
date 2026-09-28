@@ -19,17 +19,27 @@ public class FileItem : IFileSystemElement
         }
         
         FullPath = fullPath;
-        Name = new DirectoryInfo(fullPath).Name;
-        Exists = Directory.Exists(fullPath);
+        Name = new FileInfo(fullPath).Name;
+        Exists = File.Exists(fullPath);
     }
     
-    public void Delete()
+    public bool Delete()
     {
         if (Exists)
         {
-            File.Delete(FullPath);
-            Exists = false;
+            try
+            {
+                File.Delete(FullPath);
+                Exists = false;
+                return true;
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
         }
+        return false;
     }
 
     public IFileSystemElement[] GetChildren()
