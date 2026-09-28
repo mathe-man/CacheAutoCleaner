@@ -7,18 +7,8 @@ public class Folder : IFileSystemElement
     public string FullPath { get; }
     
     
-    public Folder(string fullPath, bool ignoreExisting = false)
+    public Folder(string fullPath)
     {
-        // Create the object even if the given directory doesn't exist if needed
-        if (!ignoreExisting)
-        {
-            if  (string.IsNullOrEmpty(fullPath))
-                throw new ArgumentNullException(nameof(fullPath));
-        
-            if (!Directory.Exists(fullPath))
-                throw new DirectoryNotFoundException();
-        }
-        
         FullPath = fullPath;
         Name = new DirectoryInfo(fullPath).Name;
         Exists = Directory.Exists(fullPath);
@@ -46,7 +36,9 @@ public class Folder : IFileSystemElement
     public IFileSystemElement[] GetChildren()
     {
         var children = new List<IFileSystemElement>();
-
+        if (!Exists)
+            return children.ToArray();
+        
         try
         {
             foreach (var folder in Directory.EnumerateDirectories(FullPath))

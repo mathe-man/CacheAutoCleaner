@@ -32,11 +32,11 @@ public static class Memory
         
         if (File.Exists(_directoriesSavingFile))
             foreach (var path in File.ReadAllLines(_directoriesSavingFile))
-                result.Add(new Folder(path, true));
+                result.Add(new Folder(path));
         
         if (File.Exists(_fileSavingFile))
             foreach (var path in File.ReadAllLines(_fileSavingFile))
-                result.Add(new FileItem(path, true));
+                result.Add(new FileItem(path));
 
         return result;
     }

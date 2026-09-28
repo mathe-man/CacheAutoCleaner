@@ -6,17 +6,11 @@ public class FileItem : IFileSystemElement
     public string Name { get; }
     public string FullPath { get; }
     
-    public FileItem(string fullPath, bool ignoreExisting = false)
+    public FileItem(string fullPath)
     {
-        // Create the object even if the given directory doesn't exist if needed
-        if (!ignoreExisting)
-        {
-            if  (string.IsNullOrEmpty(fullPath))
-                throw new ArgumentNullException(nameof(fullPath));
-        
-            if (!File.Exists(fullPath))
-                throw new DirectoryNotFoundException();
-        }
+        if  (string.IsNullOrEmpty(fullPath))
+            throw new ArgumentNullException(nameof(fullPath));
+
         
         FullPath = fullPath;
         Name = new FileInfo(fullPath).Name;
