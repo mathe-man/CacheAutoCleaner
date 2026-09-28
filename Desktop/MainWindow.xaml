@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Desktop"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        
+        d:DesignHeight="600" d:DesignWidth="500"
+        Title="MainWindow" Height="600" Width="500">
     <Grid>
-
+        
     </Grid>
 </Window>
