@@ -1,14 +1,18 @@
-﻿namespace CacheOperator;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public class FileSystemElement
+namespace CacheOperator;
+
+public partial class FileSystemElement : ObservableObject
 {
+    
     public bool Exists { get; protected set;  }
 
     public string Name
     { get
         { return new FileInfo(FullPath).Name; } }
+
     
-    public string FullPath { get; set; }
+    [ObservableProperty] private string _fullPath; 
 
     public bool IsFolder
     {
