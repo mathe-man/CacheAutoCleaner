@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -16,11 +17,26 @@ public partial class ViewModel : ObservableObject
     [ObservableProperty] 
     private int _cleaningIntervalSeconds = 100;
 
-    private ObservableCollection<IFileSystemElement> _elements = new();
-    
+    public ObservableCollection<FileSystemElement> Elements = new();
+
+
+    [RelayCommand]
+    private void AddElement()
+    {
+        if (string.IsNullOrWhiteSpace(NewElementPath))
+            return;
+        
+        Elements.Add(new FileSystemElement(NewElementPath));
+        
+        Memory.Save(Elements.ToList());
+    }
+
+    [RelayCommand]
+    private void SaveElements()
+        => Memory.Save(Elements.ToList());
     
     [RelayCommand]
-    public void StartCleaningStandby()
+    private void StartCleaningStandby()
         => Operator.StartParallelStandby(CleaningIntervalSeconds);
     
     [RelayCommand]

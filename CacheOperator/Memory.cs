@@ -3,40 +3,28 @@
 
 public static class Memory
 {
-    private static string _directoriesSavingFile = "directories";
-    private static string _fileSavingFile = "files";
+    private static string _itemsSavingFile = "items";
     
-    public static void Save(List<IFileSystemElement> elements)
+    public static void Save(List<FileSystemElement> elements)
     {
 
-        List<string> foldersPaths = new();
-        List<string> filesPaths = new();
+        List<string> stringPaths = new();
 
         foreach (var elem in elements)
-        {
-            if (elem is Folder folder)
-                foldersPaths.Add(folder.FullPath);
-            
-            else if (elem is FileItem  file)
-                filesPaths.Add(file.FullPath);
-        }
+            stringPaths.Add(elem.FullPath);
+        
             
         
-        File.WriteAllLines(_directoriesSavingFile,  foldersPaths);
-        File.WriteAllLines(_fileSavingFile,  filesPaths);
+        File.WriteAllLines(_itemsSavingFile,  stringPaths);
     }
 
-    public static List<IFileSystemElement> Load()
+    public static List<FileSystemElement> Load()
     {
-        var result = new List<IFileSystemElement>();
+        var result = new List<FileSystemElement>();
         
-        if (File.Exists(_directoriesSavingFile))
-            foreach (var path in File.ReadAllLines(_directoriesSavingFile))
-                result.Add(new Folder(path));
-        
-        if (File.Exists(_fileSavingFile))
-            foreach (var path in File.ReadAllLines(_fileSavingFile))
-                result.Add(new FileItem(path));
+        if (File.Exists(_itemsSavingFile))
+            foreach (var path in File.ReadAllLines(_itemsSavingFile))
+                result.Add(new FileSystemElement(path));
 
         return result;
     }

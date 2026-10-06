@@ -2,6 +2,10 @@
 
 public class Finder
 {
+    
+    // Obsolete code 
+    // TODO Remake a finder who dont need to make the difference between files and folders
+    /*
     public static IFileSystemElement[] Find(string name, Folder startingFolder)
     {
         return RecursiveSearch(name, startingFolder).ToArray();
@@ -25,4 +29,5 @@ public class Finder
         
         return result;
     }
+    */
 }

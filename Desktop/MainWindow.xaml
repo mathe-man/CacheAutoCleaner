@@ -6,9 +6,46 @@
         xmlns:local="clr-namespace:Desktop"
         mc:Ignorable="d"
         
+        DataContext="local:ViewModel"
+        
         d:DesignHeight="600" d:DesignWidth="500"
         Title="MainWindow" Height="600" Width="500">
-    <Grid>
+    
+    <Grid 
+        ColumnDefinitions="40,*,60"
+        RowDefinitions="40,*,60"
+        >
+
+        <StackPanel VerticalAlignment="Top"
+                    Grid.Column="1" Grid.Row="1">
+            
+            <!-- New item input -->
+            <StackPanel Orientation="Horizontal" >
+                
+                <TextBlock Text="New item"/>
+            
+                <TextBox MinWidth="200" FontSize="18" Height="24"
+                         Text="{Binding NewElementPath}"/>
+
+                <Button Content="Add" Command="{Binding AddElementCommand}"/>
+                
+            </StackPanel>
         
+            <DataGrid ItemsSource="{Binding Elements}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      GridLinesVisibility="Vertical">
+                
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Item" 
+                                        Binding="{Binding FullPath, Mode=TwoWay}"
+                                        Width="*"/>
+                </DataGrid.Columns>
+                
+            </DataGrid>
+            
+        </StackPanel>
+            
+            
     </Grid>
 </Window>
