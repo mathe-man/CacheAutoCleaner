@@ -76,11 +76,20 @@
             </Button>
             
             <!-- Remove button -->
-            <Button Width="100" 
+            <Button Width="100"
                     Content="Remove"
                     
                     Command="{x:Static DataGrid.DeleteCommand}"
                     CommandTarget="{Binding ElementName=ItemsGrid}"/>
+            
+            
+            <Separator Margin="0, 10,0, 20"/>
+
+            <Button Width="100"
+                    Content="Clean now"
+                    
+                    Command="{Binding CleanNowCommand}"/>
+            
         </StackPanel>
         
     </Grid>

@@ -75,6 +75,10 @@ public partial class ViewModel : ObservableObject
         => Operator.StartParallelStandby(CleaningIntervalSeconds);
     
     [RelayCommand]
-    public void StopCleaningStandby()
+    private void StopCleaningStandby()
         => Operator.StopParallelStandby();
+
+    [RelayCommand]
+    private void CleanNow()
+        => Operator.CleanCache();
 }
