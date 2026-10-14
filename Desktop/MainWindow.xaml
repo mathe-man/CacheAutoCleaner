@@ -9,12 +9,13 @@
         mc:Ignorable="d"
         
         d:DesignHeight="300" d:DesignWidth="500"
-        Title="MainWindow" MinHeight="300" 
-        MinWidth="400" Width="500">
+        Title="MainWindow" 
+        MinHeight="400" Height="600"
+        MinWidth="440" Width="550">
     
     <Grid 
-        ColumnDefinitions="40,*,30,80,30"
-        RowDefinitions="40,*,60"
+        ColumnDefinitions="*,5*,30,100,15,*"
+        RowDefinitions="*,8*,60"
         >
 
         <Grid VerticalAlignment="Top" Grid.Column="1" Grid.Row="1"
@@ -28,17 +29,16 @@
                            Text="New item" FontWeight="DemiBold"
                 />
             
-                <TextBox Grid.Column="1" Height="10" Margin="5,0"
+                <TextBox x:Name="PathInput" Grid.Column="1" Height="10" Margin="10,0,0,0"
                          FontSize="14" 
-                         Text="{Binding NewElementPath}"/>
+                         Text="{Binding NewElementPath, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <Button Grid.Column="2" Margin="5,0" 
-                        Content="Add" Command="{Binding AddElementCommand}"/>
                 
             </Grid>
             
             <!-- Items grid -->
             <DataGrid x:Name="ItemsGrid" Grid.Row="1"
+                      MinHeight="150"
                       ItemsSource="{Binding Elements}"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False" CanUserResizeRows="False"
@@ -57,10 +57,26 @@
             
         <!-- Utilities buttons -->
         <StackPanel Grid.Column="3" Grid.Row="1"
-                    Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,70,0,0">
+                    Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center">
             
+            <!-- Add button -->
+            <Button Width="100" Margin="0,3, 0,0" 
+                    Content="Add" Command="{Binding AddElementCommand}"/>
+
+            <!-- Browse button with dropdown -->
+            <Button x:Name="BtnBrowse" Content="Browse ▾" Width="100" Margin="0,9"
+                    HorizontalAlignment="Left" Click="BtnBrowse_Click">
+                
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="File"   Click="MenuFile_Click"/>
+                        <MenuItem Header="Folder" Click="MenuFolder_Click"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
             
-            <Button Width="80" 
+            <!-- Remove button -->
+            <Button Width="100" 
                     Content="Remove"
                     
                     Command="{x:Static DataGrid.DeleteCommand}"

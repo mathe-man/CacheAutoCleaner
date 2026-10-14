@@ -57,6 +57,10 @@ public partial class ViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(NewElementPath))
             return;
+
+        foreach (var fse in Elements)
+            if (fse.FullPath == NewElementPath)
+                return;
         
         Elements.Add(new FileSystemElement(NewElementPath));
     }
