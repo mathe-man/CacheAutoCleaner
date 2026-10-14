@@ -41,7 +41,7 @@ public partial class FileSystemElement : ObservableObject
             }
 
             if (IsFolder) {
-                Directory.Delete(FullPath);
+                Directory.Delete(FullPath, true); // Delete recursively
                 return true;
             }
 
