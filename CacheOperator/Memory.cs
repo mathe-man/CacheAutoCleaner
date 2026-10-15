@@ -3,7 +3,29 @@
 
 public static class Memory
 {
-    private static string _itemsSavingFile = "items";
+    public static string DataDirectory
+    {
+        get
+        {
+            string path = Path.Combine
+            (
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+                "AutoCacheCleaner"
+            );
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+
+            return path;
+        }
+    }
+    
+    
+    private static string FilePathInDataDirectory(string relativefilePath)
+        => Path.Combine(DataDirectory, relativefilePath);
+    
+    private static string _itemsSavingFile = FilePathInDataDirectory("items");
     
     public static void Save(List<FileSystemElement> elements)
     {
