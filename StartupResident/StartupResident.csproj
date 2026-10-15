@@ -8,11 +8,22 @@
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\CacheOperator\CacheOperator.csproj" />
-    </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <SelfContained>true</SelfContained>
+        <PublishSingleFile>true</PublishSingleFile>
+
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+
+        
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+
+        <DebugType>None</DebugType>
+    </PropertyGroup>
+    
 
     <ItemGroup>
+      <ProjectReference Include="..\CacheOperator\CacheOperator.csproj" />
       <PackageReference Include="WPF-UI.Tray" Version="4.3.0" />
     </ItemGroup>
 

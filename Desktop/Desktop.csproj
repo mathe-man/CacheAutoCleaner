@@ -5,17 +5,29 @@
         <!-- Allow a console for debugging -->
         <OutputType Condition="'$(Configuration)'=='Debug'">Exe</OutputType>    
         
+        
         <TargetFramework>net10.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UseWPF>true</UseWPF>
+        
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <SelfContained>true</SelfContained>
+        <PublishSingleFile>true</PublishSingleFile>
+
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        
+        <DebugType>None</DebugType>
+    </PropertyGroup>
+    
+    
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\CacheOperator\CacheOperator.csproj" />
     </ItemGroup>
 

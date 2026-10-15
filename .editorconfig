@@ -1,3 +1,0 @@
-[*.cs]
-# CS0414: Field is assigned but its value is never used
-dotnet_diagnostic.CS0414.severity = silent
