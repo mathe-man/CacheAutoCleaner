@@ -86,12 +86,12 @@ public static class Memory
     }
 
     
-    public static string GetParam(string key)
+    public static string GetParam(string key, string fallback = "")
     {
         var parameters = GetParams();
 
         if (!parameters.ContainsKey(key))
-            return string.Empty;
+            return fallback;
         
         return parameters[key]; 
     }    
