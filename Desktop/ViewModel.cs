@@ -33,6 +33,7 @@ public partial class ViewModel : ObservableObject
 
     public ViewModel()
     {
+        StayUpAfterStartupCleaning = Memory.GetParam("StayUpAfterStartupCleaning") == "true";
         Elements = new ObservableCollection<FileSystemElement>(Memory.Load());
 
         foreach (var e in Elements)
