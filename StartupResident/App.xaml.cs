@@ -14,9 +14,9 @@ public partial class App : Application
     {
         base.OnStartup(e);
         
-        if (Memory.GetParam("StartupCleanAndClose") == "true")
-        {
-            Operator.CleanCache();
+        Operator.CleanCache();
+        
+        if (Memory.GetParam("StayUpAfterStartupCleaning") != "true") {
             Shutdown();
         }
     }

@@ -20,6 +20,16 @@ public partial class ViewModel : ObservableObject
 
     public ObservableCollection<FileSystemElement> Elements { get; } = new();
 
+    
+    
+    [ObservableProperty]
+    private bool _stayUpAfterStartupCleaning = false;
+    
+    partial void OnStayUpAfterStartupCleaningChanged(bool value)
+    {
+        Memory.SetParam("StayUpAfterStartupCleaning", value ? "true" : "false");
+    }
+    
 
     public ViewModel()
     {
