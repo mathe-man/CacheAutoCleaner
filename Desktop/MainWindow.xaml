@@ -11,10 +11,10 @@
         d:DesignHeight="300" d:DesignWidth="500"
         Title="MainWindow" 
         MinHeight="550" Height="600"
-        MinWidth="550"  MaxWidth="800" Width="600">
+        MinWidth="555"  MaxWidth="800" Width="600">
     
     <Grid 
-        ColumnDefinitions="*,5*,30,100,15,*"
+        ColumnDefinitions="2*,21*,3*"
         >
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -24,11 +24,12 @@
         </Grid.RowDefinitions>
 
         <Grid VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="1"
-              RowDefinitions="Auto,*">
+              RowDefinitions="Auto,*" ColumnDefinitions="*,30,100,15">
             
             
             <!-- New item input -->
-            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,8">
+            <Grid Grid.Row="0" Grid.Column="0"
+                  ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,8">
                 
                 <TextBlock Grid.Column="0" Margin="0,10" 
                            Text="New item" FontWeight="DemiBold"
@@ -42,7 +43,7 @@
             </Grid>
             
             <!-- Items grid -->
-            <DataGrid x:Name="ItemsGrid" Grid.Row="1"
+            <DataGrid x:Name="ItemsGrid" Grid.Row="1" Grid.Column="0"
                       FontSize="13"
                       MinHeight="200"
                       ItemsSource="{Binding Elements}"
@@ -60,52 +61,79 @@
                 </DataGrid.Columns>
                 
             </DataGrid>
+            
+            
+            <!-- Utilities buttons -->
+            <StackPanel Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                        Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center">
+            
+                <!-- Add button -->
+                <Button Width="100" Margin="0,3, 0,0" 
+                        Content="Add" Command="{Binding AddElementCommand}"/>
+
+                <!-- Browse button with dropdown -->
+                <Button x:Name="BtnBrowse" Content="Browse ▾" Width="100" Margin="0,9"
+                        HorizontalAlignment="Left" Click="BtnBrowse_Click">
+                
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="File"   Click="MenuFile_Click"/>
+                            <MenuItem Header="Folder" Click="MenuFolder_Click"/>
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
+            
+                <!-- Remove button -->
+                <Button Width="100"
+                        Content="Remove"
+                    
+                        Command="{x:Static DataGrid.DeleteCommand}"
+                        CommandTarget="{Binding ElementName=ItemsGrid}"/>
+            
+            
+                <Separator Margin="0, 10,0, 20"/>
+
+                <Button Width="100"
+                        Content="Clean now"
+                    
+                        Command="{Binding CleanNowCommand}"/>
+            
+            </StackPanel>
+
         </Grid>
             
-        <!-- Utilities buttons -->
-        <StackPanel Grid.Column="3" Grid.Row="1"
-                    Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center">
-            
-            <!-- Add button -->
-            <Button Width="100" Margin="0,3, 0,0" 
-                    Content="Add" Command="{Binding AddElementCommand}"/>
-
-            <!-- Browse button with dropdown -->
-            <Button x:Name="BtnBrowse" Content="Browse ▾" Width="100" Margin="0,9"
-                    HorizontalAlignment="Left" Click="BtnBrowse_Click">
-                
-                <Button.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="File"   Click="MenuFile_Click"/>
-                        <MenuItem Header="Folder" Click="MenuFolder_Click"/>
-                    </ContextMenu>
-                </Button.ContextMenu>
-            </Button>
-            
-            <!-- Remove button -->
-            <Button Width="100"
-                    Content="Remove"
-                    
-                    Command="{x:Static DataGrid.DeleteCommand}"
-                    CommandTarget="{Binding ElementName=ItemsGrid}"/>
-            
-            
-            <Separator Margin="0, 10,0, 20"/>
-
-            <Button Width="100"
-                    Content="Clean now"
-                    
-                    Command="{Binding CleanNowCommand}"/>
-            
-        </StackPanel>
         
         <StackPanel Grid.Column="1" Grid.Row="2">
             
             <Separator Margin="0,10"/>
             
-            <CheckBox IsChecked="{Binding StayUpAfterStartupCleaning}" Content="Stay up after the startup cleaning"/>
+            <CheckBox x:Name="StayUpCheckBox"
+                IsChecked="{Binding StayUpAfterStartupCleaning, UpdateSourceTrigger=PropertyChanged}" 
+                Content="Stay up after the startup cleaning"/>
             
             
+            
+            <TextBlock Margin="0, 13,0,5" 
+                Text="Choose how often the cache is cleaned while your computer is running"/>
+            
+            <StackPanel Orientation="Horizontal">
+                
+                <Slider x:Name="PeriodSlider" 
+                        Margin="5,5"
+                        Width="200" HorizontalAlignment="Left"
+                        IsSnapToTickEnabled="True"
+                        TickPlacement="Both"
+                        IsEnabled="{Binding StayUpAfterStartupCleaning}"
+                        ValueChanged="PeriodSlider_OnValueChanged"
+                        Value="{Binding CleaningPeriodIndex}"
+                
+                        Maximum="5" Minimum="0"
+                        TickFrequency="1"/>
+                
+                <TextBlock x:Name="PeriodText"
+                           Margin="10,0" VerticalAlignment="Center"/>
+                
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

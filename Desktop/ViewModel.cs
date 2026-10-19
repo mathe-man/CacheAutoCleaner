@@ -29,11 +29,23 @@ public partial class ViewModel : ObservableObject
     {
         Memory.SetParam("StayUpAfterStartupCleaning", value ? "true" : "false");
     }
+
+
+    private string[] _cleaningPeriodIndexToSecond = ["0", "1800", "3600", "7200", "14_400", "43_200"];
+    
+    [ObservableProperty] private int _cleaningPeriodIndex = 0;
+    
+    partial void OnCleaningPeriodIndexChanged(int value)
+    {
+        Memory.SetParam("CleaningPeriod", _cleaningPeriodIndexToSecond[value]);
+    }
     
 
     public ViewModel()
     {
         StayUpAfterStartupCleaning = Memory.GetParam("StayUpAfterStartupCleaning") == "true";
+        CleaningPeriodIndex = _cleaningPeriodIndexToSecond.IndexOf(Memory.GetParam("CleaningPeriod", "0"));
+        
         Elements = new ObservableCollection<FileSystemElement>(Memory.Load());
 
         foreach (var e in Elements)
