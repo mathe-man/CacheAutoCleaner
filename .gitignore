@@ -15,3 +15,8 @@ publish
 *.filters
 
 DebugProject/
+
+# Setup
+Setup/payload-tmp
+Setup/payload.zip
+Setup/release
