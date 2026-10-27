@@ -10,22 +10,41 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        
+        if (e.Args.Contains("--uninstall"))
+        {
+            // MessageBox.Show(string messageBoxText, string caption, MessageBoxButton button, MessageBoxImage icon)
+            // -> MessageBoxResult  (nombreux autres overloads)
+            var answer = MessageBox.Show("Désinstaller AutoCacheCleaner ?", "Désinstallation",
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-        var service = new InstallService();
-        string dir = InstallPaths.DefaultInstallDir;
+            if (answer == MessageBoxResult.Yes)
+            {
+                bool ok = new InstallService().Uninstall();
+                if (!ok)
+                    MessageBox.Show("Ferme AutoCacheCleaner puis réessaie.", "Désinstallation",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
 
-        ExistingInstall? before = service.DetectExistingInstall();
+            // Application.Shutdown()
+            // (overload : Shutdown(int exitCode))
+            Shutdown();
+            return;
+        }
+        
 
-        service.CloseRunningApps(dir);
-        service.ExtractPayload(dir);
-        service.CopyUninstaller(dir);
-        service.WriteRegistry(dir, startWithWindows: true);
+        try
+        {
+            var options = new InstallOptions(InstallPaths.DefaultInstallDir, StartWithWindows: true);
+            new InstallService().Install(options);
 
-        ExistingInstall? after = service.DetectExistingInstall();
+            MessageBox.Show("Installed.", "Setup", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Setup failed", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
 
-        // MessageBox.Show(string messageBoxText)
-        MessageBox.Show($"Avant : {(before is null ? "aucune" : before.InstallDir)}\n" +
-                        $"Après : {(after is null ? "aucune" : after.InstallDir)}");
         Shutdown();
     }
 }

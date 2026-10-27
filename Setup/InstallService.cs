@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
 namespace Setup;
@@ -11,11 +12,15 @@ public static class InstallPaths
 {
     public const string AppName = "AutoCacheCleaner";
     public const string ShortcutFileName = "AutoCacheCleaner.lnk";
-    
+
+    public static readonly string StartMenuShortcutPath = 
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
+        InstallPaths.ShortcutFileName);
+
     public const string UninstallKeyPath =
         @"Software\Microsoft\Windows\CurrentVersion\Uninstall\" + AppName;
 
-    //
+    
     public static readonly string[] ProcessNames = ["Desktop", "StartupResident"];
 
     
@@ -38,6 +43,17 @@ public static class InstallPaths
 
 public record ExistingInstall(string InstallDir, string? Version);
 
+
+public record InstallOptions(string InstallDir, bool StartWithWindows);
+
+public record InstallProgress(double Progress, string Message);
+
+public class InstallException(string message) : Exception(message);
+
+public class DirectProgress<T>(Action<T> handler) : IProgress<T>
+{
+    public void Report(T value) => handler(value);
+}
 
 public class InstallService
 {
@@ -203,5 +219,143 @@ public class InstallService
         {
             run.DeleteValue(InstallPaths.AppName, throwOnMissingValue: false);
         }
+    }
+    
+    public void CreateShortcut(string installDir)
+    {
+        string target = Path.Combine(installDir, InstallPaths.MainExeName);
+
+        Type shellType = Type.GetTypeFromProgID("WScript.Shell")
+                         ?? throw new InvalidOperationException("Unable to find shell type");
+
+        dynamic shell = Activator.CreateInstance(shellType)!;
+
+        try
+        {
+            dynamic link = shell.CreateShortcut(InstallPaths.StartMenuShortcutPath);
+            link.TargetPath = target;
+            link.WorkingDirectory = installDir;
+            link.IconLocation = target + ",0";
+            link.Description = InstallPaths.AppName;
+            link.Save();
+        }
+        finally
+        {
+            Marshal.FinalReleaseComObject(shell);
+        }
+    }
+    
+    public void DeleteShortcut()
+    {
+        File.Delete(InstallPaths.StartMenuShortcutPath);
+    }
+    
+    private void RemoveRegistry(string installDir)
+    {
+        SetStartup(installDir, false);
+        Registry.CurrentUser.DeleteSubKeyTree(InstallPaths.UninstallKeyPath, throwOnMissingSubKey: false);
+    }
+
+    public void Install(InstallOptions options, IProgress<InstallProgress>? progress = null)
+    {
+        string dir = options.InstallDir;
+        bool freshInstall = DetectExistingInstall() is null;
+        bool dirExisted = Directory.Exists(dir);
+
+        // Stack of actions to undo in case of abortion
+        var undo = new Stack<Action>();
+        
+        
+        void Report(double report, string message) =>
+            progress?.Report(new InstallProgress(report, message));
+
+        try
+        {
+            Report(0.05, "Closing running applications...");
+            if (!CloseRunningApps(dir))
+                throw new InstallException("AutoCacheCleaner is still running. Please close it and try again.");
+
+
+            Report(0.10, "Copying files...");
+            // Push the undo action before starting it => preventing an error during this action
+            undo.Push(() =>
+            {
+                if (!dirExisted && Directory.Exists(dir)) Directory.Delete(dir, recursive: true);
+            });
+
+            ExtractPayload(dir, new DirectProgress<double>(f => Report(0.10 + f * 0.70, "Copying files...")));
+
+            Report(0.85, "Creating the uninstaller...");
+            CopyUninstaller(dir);
+
+            Report(0.90, "Registering the application...");
+            undo.Push(() => RemoveRegistry(dir));
+            WriteRegistry(dir, options.StartWithWindows);
+
+            Report(0.97, "Creating the Start menu shortcut...");
+            undo.Push(DeleteShortcut);
+            CreateShortcut(dir);
+            
+
+            Report(1.0, "Installation complete.");
+        }
+        
+        catch
+        {
+            if (freshInstall)
+            {
+                while (undo.Count > 0)
+                {
+                    try { undo.Pop()(); }
+                    catch { /* Cleaning shouldn't hide the crash error */ }
+                }
+            }
+            throw;
+        }
+    }
+    
+    public bool Uninstall()
+    {
+        // Get the installation directory from the register, otherwise use the local directory of the current exe
+        string dir = DetectExistingInstall()?.InstallDir
+            ?? AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+
+        if (!CloseRunningApps(dir))
+            return false;
+
+        DeleteShortcut();         // Remove the shortcut in the start menu
+        RemoveRegistry(dir);
+        
+        if (IsSafeToDelete(dir))
+            ScheduleDirectoryDeletion(dir);
+
+        return true;
+    }
+
+    // Prevent from deleting from directory such as the root
+    private static bool IsSafeToDelete(string dir)
+    {
+        string full = Path.GetFullPath(dir);
+
+        bool isRoot = string.Equals(Path.GetPathRoot(full), full + Path.DirectorySeparatorChar,
+                                    StringComparison.OrdinalIgnoreCase);
+
+        return !isRoot
+            && Path.GetFileName(full).Equals(InstallPaths.AppName, StringComparison.OrdinalIgnoreCase)
+            && File.Exists(Path.Combine(full, InstallPaths.UninstallerFileName));
+    }
+
+    private static void ScheduleDirectoryDeletion(string dir)
+    {
+        // Wait a couple second then delete
+        var info = new ProcessStartInfo("cmd.exe",
+            $"/c ping 127.0.0.1 -n 4 > nul & rmdir /s /q \"{dir}\"")
+        {
+            CreateNoWindow = true,
+            UseShellExecute = false,
+            WindowStyle = ProcessWindowStyle.Hidden
+        };
+
+        Process.Start(info);
     }
 }
